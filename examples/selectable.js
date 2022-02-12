@@ -5315,7 +5315,7 @@ var elm$core$Maybe$withDefault = F2(
 	});
 var elm$core$String$fromInt = _String_fromNumber;
 var elm$core$String$toInt = _String_toInt;
-var author$project$Main$model = {
+var author$project$Main$base_model = {
 	calendarState: A2(author$project$Calendar2$init, author$project$Calendar2$Week, author$project$Fixtures$viewing),
 	curEventId: elm$core$String$fromInt(
 		A2(
@@ -5688,7 +5688,7 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$init = function (_n0) {
-	return _Utils_Tuple2(author$project$Main$model, elm$core$Platform$Cmd$none);
+	return _Utils_Tuple2(author$project$Main$base_model, elm$core$Platform$Cmd$none);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
@@ -6759,7 +6759,7 @@ var author$project$Main$addEventPreviewToEvents = function (model_) {
 				elm$core$Debug$log,
 				'newEvent',
 				defaultEmptyTitle(event)),
-			author$project$Main$model.events);
+			model_.events);
 	};
 	return _Utils_update(
 		model_,
@@ -6920,9 +6920,10 @@ var author$project$Main$Event = F4(
 	});
 var author$project$Main$createEventPreview = F4(
 	function (date, xy, minutes, model_) {
+		var _n0 = A2(elm$core$Debug$log, 'createEventPreview:', date);
 		var newEvent = A4(
 			author$project$Main$Event,
-			author$project$Main$newEventId(author$project$Main$model.curEventId),
+			author$project$Main$newEventId(model_.curEventId),
 			'',
 			date,
 			A4(justinmimbs$time_extra$Time$Extra$add, justinmimbs$time_extra$Time$Extra$Millisecond, minutes, elm$time$Time$utc, date));
@@ -6935,6 +6936,7 @@ var author$project$Main$createEventPreview = F4(
 	});
 var author$project$Main$extendEventPreview = F3(
 	function (date, xy, model_) {
+		var _n0 = A2(elm$core$Debug$log, 'extendEventPreview:', date);
 		var extend = function (eventPreview) {
 			var event = eventPreview.event;
 			var position = eventPreview.position;
@@ -6987,7 +6989,6 @@ var elm$core$Dict$get = F2(
 	});
 var author$project$Main$selectEvent = F2(
 	function (eventId, model_) {
-		var _n0 = A2(elm$core$Debug$log, 'selectEvent:', eventId);
 		return _Utils_update(
 			model_,
 			{
@@ -7009,44 +7010,44 @@ var author$project$Main$showCreateEventDialog = function (model_) {
 };
 var author$project$Main$updateCalendar = F2(
 	function (msg, model_) {
-		var _n0 = A2(elm$core$Debug$log, 'calendarMsg', msg);
-		switch (_n0.$) {
+		var _n0 = A2(elm$core$Debug$log, 'calendarMsg:', msg);
+		switch (msg.$) {
 			case 'SelectDate':
-				var date = _n0.a;
-				var xy = _n0.b;
+				var date = msg.a;
+				var xy = msg.b;
 				return author$project$Main$showCreateEventDialog(
 					A4(author$project$Main$createEventPreview, date, xy, 60, model_));
 			case 'CreateEventPreview':
-				var date = _n0.a;
-				var xy = _n0.b;
+				var date = msg.a;
+				var xy = msg.b;
 				return A4(author$project$Main$createEventPreview, date, xy, 30, model_);
 			case 'ExtendEventPreview':
-				var date = _n0.a;
-				var xy = _n0.b;
+				var date = msg.a;
+				var xy = msg.b;
 				return A3(author$project$Main$extendEventPreview, date, xy, model_);
 			case 'ShowCreateEventDialog':
-				var date = _n0.a;
-				var xy = _n0.b;
+				var date = msg.a;
+				var xy = msg.b;
 				return author$project$Main$showCreateEventDialog(
 					A3(author$project$Main$extendEventPreview, date, xy, model_));
 			case 'SelectEvent':
-				var eventId = _n0.a;
+				var eventId = msg.a;
 				return A2(author$project$Main$selectEvent, eventId, model_);
 			case 'ExtendingEvent':
-				var timeDiff = _n0.b;
+				var timeDiff = msg.b;
 				return _Utils_update(
 					model_,
 					{
 						eventExtendAmount: elm$time$Time$millisToPosix(timeDiff)
 					});
 			default:
-				var eventId = _n0.a;
-				var timeDiff = _n0.b;
+				var eventId = msg.a;
+				var timeDiff = msg.b;
 				var newEnd = function (end) {
 					return elm$time$Time$millisToPosix(
 						timeDiff + elm$time$Time$posixToMillis(end));
 				};
-				var maybeEvent = A2(elm$core$Dict$get, eventId, author$project$Main$model.events);
+				var maybeEvent = A2(elm$core$Dict$get, eventId, model_.events);
 				var extendEvent = function (event) {
 					return _Utils_update(
 						event,
@@ -7059,7 +7060,7 @@ var author$project$Main$updateCalendar = F2(
 						elm$core$Dict$insert,
 						eventId,
 						extendEvent(event),
-						author$project$Main$model.events);
+						model_.events);
 				};
 				if (maybeEvent.$ === 'Nothing') {
 					return model_;
@@ -7472,7 +7473,7 @@ var author$project$Main$pureUpdate = F2(
 				var updatedCalendar = _n1.a;
 				var maybeMsg = _n1.b;
 				var newModel = _Utils_update(
-					author$project$Main$model,
+					model_,
 					{calendarState: updatedCalendar});
 				if (maybeMsg.$ === 'Nothing') {
 					return newModel;
@@ -10724,7 +10725,6 @@ var author$project$Main$viewConfig = author$project$Calendar2$viewConfig(
 		},
 		event: F2(
 			function (event, isSelected) {
-				var _n0 = A2(elm$core$Debug$log, 'viewConfig/event:', isSelected);
 				return author$project$Calendar2$eventView(
 					{
 						children: _List_fromArray(
